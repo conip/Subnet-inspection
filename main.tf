@@ -1,4 +1,4 @@
-#---------------------------------------------------------- EUROPE ----------------------------------------------------------
+#---------------------------------------------------------- Transit ----------------------------------------------------------
 module "AZ_transit_1_fw" {
   source  = "terraform-aviatrix-modules/azure-transit-firenet/aviatrix"
   version = "5.0.1"
@@ -24,48 +24,56 @@ module "AZ_transit_1_fw" {
 
 #--------------------------------------------------------- SPOKE 1 --------------------------------------------------------
 module "az_spoke_1" {
-  source  = "terraform-aviatrix-modules/mc-spoke/aviatrix"
-  version = "1.1.0"
-  name    = "AZ-spoke-1"
-  cloud   = "Azure"
-  region  = "UK South"
-  cidr    = "10.112.0.0/16"
-  #transit_gw = module.azure-transit-firenet.transit_gateway.gw_name
+  source     = "terraform-aviatrix-modules/mc-spoke/aviatrix"
+  version    = "1.1.0"
+  name       = "AZ-spoke-1"
+  cloud      = "Azure"
+  region     = "UK South"
+  cidr       = "10.112.0.0/16"
   transit_gw = module.AZ_transit_1_fw.transit_gateway.gw_name
   account    = var.avx_ctrl_account_azure
+  depends_on = [
+    module.AZ_transit_1_fw
+  ]
 }
 
 module "spoke_1_vm1" {
-  source = "git::https://github.com/conip/terraform-azure-instance-build-module.git"
-  name   = "spoke1-vm1-jump"
-  region = "UK South"
-  rg     = module.az_spoke_1.vpc.resource_group
-  #vpc_id    = module.az_spoke_1.vpc.vpc_id
+  source    = "git::https://github.com/conip/terraform-azure-instance-build-module.git"
+  name      = "spoke1-vm1-jump"
+  region    = "UK South"
+  rg        = module.az_spoke_1.vpc.resource_group
   subnet_id = module.az_spoke_1.vpc.public_subnets[1].subnet_id
   ssh_key   = var.ssh_key
   public_ip = true
+  depends_on = [
+    module.az_spoke_1
+  ]
 }
 
 module "spoke_1_vm2" {
-  source = "git::https://github.com/conip/terraform-azure-instance-build-module.git"
-  name   = "spoke1-vm2"
-  region = "UK South"
-  rg     = module.az_spoke_1.vpc.resource_group
-  #vpc_id    = module.az_spoke_1.vpc.vpc_id
+  source    = "git::https://github.com/conip/terraform-azure-instance-build-module.git"
+  name      = "spoke1-vm2"
+  region    = "UK South"
+  rg        = module.az_spoke_1.vpc.resource_group
   subnet_id = module.az_spoke_1.vpc.private_subnets[1].subnet_id
   ssh_key   = var.ssh_key
   public_ip = false
+  depends_on = [
+    module.az_spoke_1
+  ]
 }
 
 module "spoke_1_vm3" {
-  source = "git::https://github.com/conip/terraform-azure-instance-build-module.git"
-  name   = "spoke1-vm3"
-  region = "UK South"
-  rg     = module.az_spoke_1.vpc.resource_group
-  #vpc_id    = module.az_spoke_1.vpc.vpc_id
+  source    = "git::https://github.com/conip/terraform-azure-instance-build-module.git"
+  name      = "spoke1-vm3"
+  region    = "UK South"
+  rg        = module.az_spoke_1.vpc.resource_group
   subnet_id = module.az_spoke_1.vpc.public_subnets[1].subnet_id
   ssh_key   = var.ssh_key
   public_ip = true
+  depends_on = [
+    module.az_spoke_1
+  ]
 }
 
 resource "aviatrix_spoke_gateway_subnet_group" "subnet_group_spoke1_prod" {
@@ -90,11 +98,19 @@ resource "aviatrix_spoke_gateway_subnet_group" "subnet_group_spoke1_open" {
 resource "aviatrix_transit_firenet_policy" "inspection_spoke1_prod" {
   transit_firenet_gateway_name = module.AZ_transit_1_fw.transit_gateway.gw_name
   inspected_resource_name      = "SPOKE_SUBNET_GROUP:${module.az_spoke_1.spoke_gateway.gw_name}~~${aviatrix_spoke_gateway_subnet_group.subnet_group_spoke1_prod.name}"
+  depends_on = [
+    module.az_spoke_1,
+    module.AZ_transit_1_fw
+  ]
 }
 
 resource "aviatrix_transit_firenet_policy" "inspection_spoke1_open" {
   transit_firenet_gateway_name = module.AZ_transit_1_fw.transit_gateway.gw_name
   inspected_resource_name      = "SPOKE_SUBNET_GROUP:${module.az_spoke_1.spoke_gateway.gw_name}~~${aviatrix_spoke_gateway_subnet_group.subnet_group_spoke1_open.name}"
+  depends_on = [
+    module.az_spoke_1,
+    module.AZ_transit_1_fw
+  ]
 }
 
 
