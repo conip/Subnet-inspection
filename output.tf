@@ -1,54 +1,34 @@
-output "TrGW_map" {
-    value = tomap({
-        "${module.AZ_transit_1_fw.transit_gateway.vpc_reg}" = "${module.AZ_transit_1_fw.transit_gateway.gw_name}",
-        EU-Wes = "test"
-    })
+#---------------------------- spoke 1 -------------------------------
+output "spoke1_vm1" {
+    value = { "public_IP" = module.spoke_1_vm1.public_ip.ip_address, "private_ip" = module.spoke_1_vm1.private_ip }
 }
 
-output "subnet_output_1" {
-  value = local.subnet_map
+output "spoke1_vm2" {
+    value = { "public_IP" = module.spoke_1_vm2.public_ip.ip_address, "private_ip" = module.spoke_1_vm2.private_ip }
 }
 
-# output "subnet_output_2" {
-#   value = local.subnet_map_result2
-# }
-output "vnet2_aviatrix_subnet" {
-  value = local.vnet2_aviatrix_subnet
+output "spoke1_vm3" {
+    value = { "public_IP" = module.spoke_1_vm3.public_ip.ip_address, "private_ip" = module.spoke_1_vm3.private_ip }
 }
 
-# output "subnet_output_3" {
-#   value = merge(local.result3)
-# }
-
-# output "subnet_output1" {
-#   value = local.subnet_map1
-# }
-
-# output "subnet_output2" {
-#   value = local.subnet_map2
-# }
-
-
-# output "spoke_vpc" {
-#     value = module.az_spoke_1.vpc
-# }
-
-output "spoke1_vm1_public_IP" {
-    value = module.spoke_1_vm1.public_ip.ip_address
+output "spoke1_vm4" {
+   value = { "public_IP" = module.spoke_1_vm4.public_ip.ip_address, "private_IP" = module.spoke_1_vm4.private_ip }
 }
 
-output "spoke1_vm1_private_IP" {
-    value = module.spoke_1_vm1.private_ip
+output "spoke1_vm5" {
+   value = { "public_IP" = module.spoke_1_vm5.public_ip.ip_address, "private_IP" = module.spoke_1_vm5.private_ip }
 }
 
-output "spoke1_vm2_private_IP" {
-    value = module.spoke_1_vm2.private_ip
+#---------------------------- spoke 2 -------------------------------
+output "spoke2_vm1" {
+   value = { "public_IP" = module.spoke_2_vm1.public_ip.ip_address, "private_IP" = module.spoke_2_vm1.private_ip }
 }
 
-output "spoke1_vm3_private_IP" {
-    value = module.spoke_1_vm3.private_ip
+output "spoke2_vm2" {
+   value = { "public_IP" = module.spoke_2_vm2.public_ip.ip_address, "private_IP" = module.spoke_2_vm2.private_ip }
 }
 
-output "spoke2_vm1_private_IP" {
- value = module.spoke_2_vm1.private_ip
+output "spoke2_vm3" {
+   value = { "public_IP" = module.spoke_2_vm3.public_ip.ip_address, "private_IP" = module.spoke_2_vm3.private_ip }
 }
+

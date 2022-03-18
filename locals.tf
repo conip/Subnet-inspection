@@ -77,9 +77,21 @@ locals {
 
     ]
   ])
-   spoke2_user_subnet_id_1 = [
-       for block in azurerm_virtual_network.vnet_spoke_2.subnet[*] : block["id"]
-       if block["name"] == "subnet-user-1"
+  spoke2_user_subnet_1 = [
+    for block in azurerm_virtual_network.vnet_spoke_2.subnet[*] : block
+    if block["name"] == "subnet-user-1"
+
+  ]
+
+  spoke2_user_subnet_2 = [
+    for block in azurerm_virtual_network.vnet_spoke_2.subnet[*] : block
+    if block["name"] == "subnet-user-2"
+
+  ]
+
+  spoke2_user_subnet_3 = [
+    for block in azurerm_virtual_network.vnet_spoke_2.subnet[*] : block
+    if block["name"] == "subnet-user-3"
 
   ]
   /*
