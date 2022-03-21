@@ -1,5 +1,7 @@
 # working !! ------------
 locals {
+  env_prefix = "lab"
+
   subnet_map1 = flatten([
     #for name, address_prefix in azurerm_virtual_network.vnet_spoke_1.subnet : name => address_prefix 
     for subnet_block in azurerm_virtual_network.vnet_spoke_2.subnet : [

@@ -39,7 +39,7 @@ module "az_spoke_1" {
 
 module "spoke_1_vm1" {
   source    = "git::https://github.com/conip/terraform-azure-instance-build-module.git"
-  name      = "lab-spoke1-vm1-jump"
+  name      = "lab-spoke1-vm1"
   region    = "UK South"
   rg        = module.az_spoke_1.vpc.resource_group
   subnet_id = module.az_spoke_1.vpc.public_subnets[1].subnet_id
