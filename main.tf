@@ -3,7 +3,7 @@ module "AZ_transit_1_fw" {
   source  = "terraform-aviatrix-modules/azure-transit-firenet/aviatrix"
   version = "5.0.1"
 
-  name                     = "SubGr-AZ-trans-1"
+  name                     = "lab-AZ-trans-1"
   region                   = "UK South"
   cidr                     = "10.111.0.0/23"
   account                  = var.avx_ctrl_account_azure
@@ -26,7 +26,7 @@ module "AZ_transit_1_fw" {
 module "az_spoke_1" {
   source     = "terraform-aviatrix-modules/mc-spoke/aviatrix"
   version    = "1.1.0"
-  name       = "SubGr-AZ-spoke-1"
+  name       = "lab-AZ-spoke-1"
   cloud      = "Azure"
   region     = "UK South"
   cidr       = "10.112.0.0/16"
@@ -39,7 +39,7 @@ module "az_spoke_1" {
 
 module "spoke_1_vm1" {
   source    = "git::https://github.com/conip/terraform-azure-instance-build-module.git"
-  name      = "SubGr-spoke1-vm1-jump"
+  name      = "lab-spoke1-vm1-jump"
   region    = "UK South"
   rg        = module.az_spoke_1.vpc.resource_group
   subnet_id = module.az_spoke_1.vpc.public_subnets[1].subnet_id
@@ -52,7 +52,7 @@ module "spoke_1_vm1" {
 
 module "spoke_1_vm2" {
   source    = "git::https://github.com/conip/terraform-azure-instance-build-module.git"
-  name      = "SubGr-spoke1-vm2"
+  name      = "lab-spoke1-vm2"
   region    = "UK South"
   rg        = module.az_spoke_1.vpc.resource_group
   subnet_id = module.az_spoke_1.vpc.private_subnets[1].subnet_id
@@ -65,7 +65,7 @@ module "spoke_1_vm2" {
 
 module "spoke_1_vm3" {
   source    = "git::https://github.com/conip/terraform-azure-instance-build-module.git"
-  name      = "SubGr-spoke1-vm3"
+  name      = "lab-spoke1-vm3"
   region    = "UK South"
   rg        = module.az_spoke_1.vpc.resource_group
   subnet_id = module.az_spoke_1.vpc.public_subnets[1].subnet_id
@@ -78,7 +78,7 @@ module "spoke_1_vm3" {
 
 module "spoke_1_vm4" {
   source    = "git::https://github.com/conip/terraform-azure-instance-build-module.git"
-  name      = "SubGr-spoke1-vm4"
+  name      = "lab-spoke1-vm4"
   region    = "UK South"
   rg        = module.az_spoke_1.vpc.resource_group
   subnet_id = module.az_spoke_1.vpc.public_subnets[2].subnet_id
@@ -91,7 +91,7 @@ module "spoke_1_vm4" {
 
 module "spoke_1_vm5" {
   source    = "git::https://github.com/conip/terraform-azure-instance-build-module.git"
-  name      = "SubGr-spoke1-vm5"
+  name      = "lab-spoke1-vm5"
   region    = "UK South"
   rg        = module.az_spoke_1.vpc.resource_group
   subnet_id = module.az_spoke_1.vpc.public_subnets[2].subnet_id
@@ -108,12 +108,12 @@ module "spoke_1_vm5" {
 
 
 resource "azurerm_resource_group" "rg-test" {
-  name     = "SubGr-RG-spoke-2CIDRs"
+  name     = "lab-RG-spoke-2CIDRs"
   location = "West Europe"
 }
 
 resource "azurerm_virtual_network" "vnet_spoke_2" {
-  name                = "SubGr-vnet-spoke-2"
+  name                = "lab-vnet-spoke-2"
   location            = azurerm_resource_group.rg-test.location
   resource_group_name = azurerm_resource_group.rg-test.name
   address_space       = ["10.113.0.0/16", "192.168.1.0/29"]
@@ -141,7 +141,7 @@ resource "azurerm_virtual_network" "vnet_spoke_2" {
 module "az_spoke_2" {
   source           = "terraform-aviatrix-modules/mc-spoke/aviatrix"
   version          = "1.1.0"
-  name             = "SubGr-AZ-spoke-2"
+  name             = "lab-AZ-spoke-2"
   cloud            = "Azure"
   region           = "West Europe"
   use_existing_vpc = true
@@ -157,7 +157,7 @@ module "az_spoke_2" {
 
 module "spoke_2_vm1" {
   source    = "git::https://github.com/conip/terraform-azure-instance-build-module.git"
-  name      = "SubGr-spoke2-vm1"
+  name      = "lab-spoke2-vm1"
   region    = "West Europe"
   rg        = azurerm_resource_group.rg-test.name
   subnet_id = local.spoke2_user_subnet_1[0].id
@@ -170,7 +170,7 @@ module "spoke_2_vm1" {
 
 module "spoke_2_vm2" {
   source    = "git::https://github.com/conip/terraform-azure-instance-build-module.git"
-  name      = "SubGr-spoke2-vm2"
+  name      = "lab-spoke2-vm2"
   region    = "West Europe"
   rg        = azurerm_resource_group.rg-test.name
   subnet_id = local.spoke2_user_subnet_2[0].id
@@ -183,7 +183,7 @@ module "spoke_2_vm2" {
 
 module "spoke_2_vm3" {
   source    = "git::https://github.com/conip/terraform-azure-instance-build-module.git"
-  name      = "SubGr-spoke2-vm3"
+  name      = "lab-spoke2-vm3"
   region    = "West Europe"
   rg        = azurerm_resource_group.rg-test.name
   subnet_id = local.spoke2_user_subnet_3[0].id
@@ -263,10 +263,10 @@ resource "aviatrix_transit_firenet_policy" "inspection_policy_1" {
 # }
 
 variable "inspected_resources" {
-  type    = set(string)
+  type = set(string)
   default = [
-    "SPOKE_SUBNET_GROUP:SubGr-AZ-spoke-2~~SG-prod",
-    "SPOKE_SUBNET_GROUP:SubGr-AZ-spoke-2~~SG-open"
+    "SPOKE_SUBNET_GROUP:lab-AZ-spoke-2~~SG-prod",
+    "SPOKE_SUBNET_GROUP:lab-AZ-spoke-2~~SG-open"
   ]
 }
 
@@ -274,6 +274,12 @@ resource "aviatrix_transit_firenet_policy" "inspection_policy_spoke2" {
   for_each                     = var.inspected_resources
   transit_firenet_gateway_name = module.AZ_transit_1_fw.transit_gateway.gw_name
   inspected_resource_name      = each.value
+
+  depends_on = [
+    module.az_spoke_1,
+    module.az_spoke_2,
+    module.AZ_transit_1_fw
+  ]
 }
 
 
