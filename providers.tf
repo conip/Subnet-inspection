@@ -2,6 +2,7 @@ provider "aviatrix" {
   username      = "admin"
   password      = var.avx_controller_admin_password
   controller_ip = var.controller_ip
+    skip_version_validation = true
 }
 provider "azurerm" {
   # subscription_id = var.subscription_id

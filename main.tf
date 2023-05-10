@@ -38,7 +38,7 @@ module "az_spoke_1" {
 }
 
 module "spoke_1_vm1" {
-  source    = "git::https://github.com/conip/terraform-azure-instance-build-module.git"
+  source    = "git::https://github.com/conip/terraform-azure-instance-build-module.git?ref=v1.0.3"
   name      = "lab-spoke1-vm1"
   region    = "UK South"
   rg        = module.az_spoke_1.vpc.resource_group
@@ -51,7 +51,7 @@ module "spoke_1_vm1" {
 }
 
 module "spoke_1_vm2" {
-  source    = "git::https://github.com/conip/terraform-azure-instance-build-module.git"
+  source    = "git::https://github.com/conip/terraform-azure-instance-build-module.git?ref=v1.0.3"
   name      = "lab-spoke1-vm2"
   region    = "UK South"
   rg        = module.az_spoke_1.vpc.resource_group
@@ -64,7 +64,7 @@ module "spoke_1_vm2" {
 }
 
 module "spoke_1_vm3" {
-  source    = "git::https://github.com/conip/terraform-azure-instance-build-module.git"
+  source    = "git::https://github.com/conip/terraform-azure-instance-build-module.git?ref=v1.0.3"
   name      = "lab-spoke1-vm3"
   region    = "UK South"
   rg        = module.az_spoke_1.vpc.resource_group
@@ -77,7 +77,7 @@ module "spoke_1_vm3" {
 }
 
 module "spoke_1_vm4" {
-  source    = "git::https://github.com/conip/terraform-azure-instance-build-module.git"
+  source    = "git::https://github.com/conip/terraform-azure-instance-build-module.git?ref=v1.0.3"
   name      = "lab-spoke1-vm4"
   region    = "UK South"
   rg        = module.az_spoke_1.vpc.resource_group
@@ -90,7 +90,7 @@ module "spoke_1_vm4" {
 }
 
 module "spoke_1_vm5" {
-  source    = "git::https://github.com/conip/terraform-azure-instance-build-module.git"
+  source    = "git::https://github.com/conip/terraform-azure-instance-build-module.git?ref=v1.0.3"
   name      = "lab-spoke1-vm5"
   region    = "UK South"
   rg        = module.az_spoke_1.vpc.resource_group
@@ -156,7 +156,7 @@ module "az_spoke_2" {
 }
 
 module "spoke_2_vm1" {
-  source    = "git::https://github.com/conip/terraform-azure-instance-build-module.git"
+  source    = "git::https://github.com/conip/terraform-azure-instance-build-module.git?ref=v1.0.3"
   name      = "lab-spoke2-vm1"
   region    = "West Europe"
   rg        = azurerm_resource_group.rg-test.name
@@ -169,7 +169,7 @@ module "spoke_2_vm1" {
 }
 
 module "spoke_2_vm2" {
-  source    = "git::https://github.com/conip/terraform-azure-instance-build-module.git"
+  source    = "git::https://github.com/conip/terraform-azure-instance-build-module.git?ref=v1.0.3"
   name      = "lab-spoke2-vm2"
   region    = "West Europe"
   rg        = azurerm_resource_group.rg-test.name
@@ -182,7 +182,7 @@ module "spoke_2_vm2" {
 }
 
 module "spoke_2_vm3" {
-  source    = "git::https://github.com/conip/terraform-azure-instance-build-module.git"
+  source    = "git::https://github.com/conip/terraform-azure-instance-build-module.git?ref=v1.0.3"
   name      = "lab-spoke2-vm3"
   region    = "West Europe"
   rg        = azurerm_resource_group.rg-test.name
@@ -197,90 +197,73 @@ module "spoke_2_vm3" {
 
 #------------------------------------------------------- SG definitions + policies
 
-resource "aviatrix_spoke_gateway_subnet_group" "subnet_group_spoke1_prod" {
-  name    = "SG-prod"
-  gw_name = module.az_spoke_1.spoke_gateway.gw_name
-  subnets = [
-    "${module.az_spoke_1.vpc.private_subnets[1].cidr}~~${module.az_spoke_1.vpc.private_subnets[1].name}",
-    "${module.az_spoke_1.vpc.public_subnets[1].cidr}~~${module.az_spoke_1.vpc.public_subnets[1].name}"
-  ]
-  depends_on = [
-    module.az_spoke_1
-  ]
-}
+# resource "aviatrix_spoke_gateway_subnet_group" "subnet_group_spoke1_prod" {
+#   name    = "SG-prod"
+#   gw_name = module.az_spoke_1.spoke_gateway.gw_name
+#   subnets = [
+#     "${module.az_spoke_1.vpc.private_subnets[1].cidr}~~${module.az_spoke_1.vpc.private_subnets[1].name}",
+#     "${module.az_spoke_1.vpc.public_subnets[1].cidr}~~${module.az_spoke_1.vpc.public_subnets[1].name}"
+#   ]
+#   depends_on = [
+#     module.az_spoke_1
+#   ]
+# }
 
-resource "aviatrix_spoke_gateway_subnet_group" "subnet_group_spoke2_prod" {
-  name    = "SG-prod"
-  gw_name = module.az_spoke_2.spoke_gateway.gw_name
-  subnets = [
-    "${local.spoke2_user_subnet_1[0].address_prefix}~~${local.spoke2_user_subnet_1[0].name}"
-  ]
-  depends_on = [
-    module.az_spoke_2,
-    azurerm_virtual_network.vnet_spoke_2
-  ]
-}
-
-resource "aviatrix_spoke_gateway_subnet_group" "subnet_group_spoke2_open" {
-  name    = "SG-open"
-  gw_name = module.az_spoke_2.spoke_gateway.gw_name
-  subnets = [
-    "${local.spoke2_user_subnet_2[0].address_prefix}~~${local.spoke2_user_subnet_2[0].name}"
-  ]
-  depends_on = [
-    module.az_spoke_2,
-    azurerm_virtual_network.vnet_spoke_2
-  ]
-}
-
-
-
-resource "aviatrix_transit_firenet_policy" "inspection_policy_1" {
-  transit_firenet_gateway_name = module.AZ_transit_1_fw.transit_gateway.gw_name
-  inspected_resource_name      = "SPOKE_SUBNET_GROUP:${module.az_spoke_1.spoke_gateway.gw_name}~~${aviatrix_spoke_gateway_subnet_group.subnet_group_spoke1_prod.name}"
-  depends_on = [
-    module.az_spoke_1,
-    module.AZ_transit_1_fw
-  ]
-}
-
-# resource "aviatrix_transit_firenet_policy" "inspection_policy_2" {
-#   transit_firenet_gateway_name = module.AZ_transit_1_fw.transit_gateway.gw_name
-#   inspected_resource_name      = "SPOKE_SUBNET_GROUP:${module.az_spoke_2.spoke_gateway.gw_name}~~SG-prod"
+# resource "aviatrix_spoke_gateway_subnet_group" "subnet_group_spoke2_prod" {
+#   name    = "SG-prod"
+#   gw_name = module.az_spoke_2.spoke_gateway.gw_name
+#   subnets = [
+#     "${local.spoke2_user_subnet_1[0].address_prefix}~~${local.spoke2_user_subnet_1[0].name}"
+#   ]
 #   depends_on = [
 #     module.az_spoke_2,
+#     azurerm_virtual_network.vnet_spoke_2
+#   ]
+# }
+
+# resource "aviatrix_spoke_gateway_subnet_group" "subnet_group_spoke2_open" {
+#   name    = "SG-open"
+#   gw_name = module.az_spoke_2.spoke_gateway.gw_name
+#   subnets = [
+#     "${local.spoke2_user_subnet_2[0].address_prefix}~~${local.spoke2_user_subnet_2[0].name}"
+#   ]
+#   depends_on = [
+#     module.az_spoke_2,
+#     azurerm_virtual_network.vnet_spoke_2
+#   ]
+# }
+
+
+
+# resource "aviatrix_transit_firenet_policy" "inspection_policy_1" {
+#   transit_firenet_gateway_name = module.AZ_transit_1_fw.transit_gateway.gw_name
+#   inspected_resource_name      = "SPOKE_SUBNET_GROUP:${module.az_spoke_1.spoke_gateway.gw_name}~~${aviatrix_spoke_gateway_subnet_group.subnet_group_spoke1_prod.name}"
+#   depends_on = [
+#     module.az_spoke_1,
 #     module.AZ_transit_1_fw
 #   ]
 # }
 
-# resource "aviatrix_transit_firenet_policy" "inspection_policy_3" {
+
+# variable "inspected_resources" {
+#   type = set(string)
+#   default = [
+#     "SPOKE_SUBNET_GROUP:lab-AZ-spoke-2~~SG-prod",
+#     "SPOKE_SUBNET_GROUP:lab-AZ-spoke-2~~SG-open"
+#   ]
+# }
+
+# resource "aviatrix_transit_firenet_policy" "inspection_policy_spoke2" {
+#   for_each                     = var.inspected_resources
 #   transit_firenet_gateway_name = module.AZ_transit_1_fw.transit_gateway.gw_name
-#   inspected_resource_name      = "SPOKE_SUBNET_GROUP:${module.az_spoke_2.spoke_gateway.gw_name}~~SG-open"
+#   inspected_resource_name      = each.value
+
 #   depends_on = [
+#     module.az_spoke_1,
 #     module.az_spoke_2,
 #     module.AZ_transit_1_fw
 #   ]
 # }
-
-variable "inspected_resources" {
-  type = set(string)
-  default = [
-    "SPOKE_SUBNET_GROUP:lab-AZ-spoke-2~~SG-prod",
-    "SPOKE_SUBNET_GROUP:lab-AZ-spoke-2~~SG-open"
-  ]
-}
-
-resource "aviatrix_transit_firenet_policy" "inspection_policy_spoke2" {
-  for_each                     = var.inspected_resources
-  transit_firenet_gateway_name = module.AZ_transit_1_fw.transit_gateway.gw_name
-  inspected_resource_name      = each.value
-
-  depends_on = [
-    module.az_spoke_1,
-    module.az_spoke_2,
-    module.AZ_transit_1_fw
-  ]
-}
 
 
 # #-------------------------------------- private DNS setup --------------------------------------

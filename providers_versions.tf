@@ -10,7 +10,7 @@ terraform {
 
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">=2.46.0"
+      version = "~>3.15.1"
     }
 
     aviatrix = {
@@ -19,7 +19,10 @@ terraform {
     }
     aws = {
       source = "hashicorp/aws"
+      version = "~>3.0.0"
     }
+
+    # test with local added here
   }
 }
 
